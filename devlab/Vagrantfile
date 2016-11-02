@@ -35,10 +35,13 @@ Vagrant.configure("2") do |config|
       sudo dpkg -i telegraf_1.0.1_amd64.deb
       sudo cp /vagrant/telegraf.conf /etc/telegraf/
       sudo service telegraf start
+      pip install requests
+      nohup python /vagrant/load_proxy.py &
       wget https://grafanarel.s3.amazonaws.com/builds/grafana_3.1.1-1470047149_amd64.deb
       sudo apt-get install -y adduser libfontconfig
       sudo dpkg -i grafana_3.1.1-1470047149_amd64.deb
       sudo service grafana-server start
+      python /vagrant/graphana_setup.py
 
     SHELL
   end
