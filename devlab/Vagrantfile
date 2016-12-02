@@ -7,11 +7,12 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "tsdb" do |tsdb_cfg|
     tsdb_cfg.vm.hostname = "tsdb"
-    tsdb_cfg.vm.network "private_network", ip: "192.168.1.10"
+    tsdb_cfg.vm.network "private_network", ip: "10.10.10.10"
     tsdb_cfg.vm.provision "shell", inline: <<-SHELL
       curl -sL https://repos.influxdata.com/influxdb.key | apt-key add - source /etc/lsb-release
       echo "deb https://repos.influxdata.com/ubuntu trusty stable" | tee /etc/apt/sources.list.d/influxdb.list
       apt-get update && apt-get install -y influxdb
+      sudo cp /vagrant/influxdb.conf /etc/influxdb/
       service influxdb start
 
     SHELL
@@ -20,7 +21,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "test_data1" do |test_data1_cfg|
     test_data1_cfg.vm.hostname = "test-data1"
-    test_data1_cfg.vm.network "private_network", ip: "192.168.1.20"
+    test_data1_cfg.vm.network "private_network", ip: "10.10.10.2"
     test_data1_cfg.vm.provision "shell", inline: <<-SHELL
       apt-get install -y python-pip python-dev
       pip install Flask
@@ -41,7 +42,7 @@ Vagrant.configure("2") do |config|
       sudo apt-get install -y adduser libfontconfig
       sudo dpkg -i grafana_3.1.1-1470047149_amd64.deb
       sudo service grafana-server start
-      python /vagrant/graphana_setup.py
+      python /vagrant/graphana_setup.py http://10.10.10.2:3000 http://10.10.10.10:8086 haproxy_db haproxy --is_default_true graphs_dashboard.json second_dashboard.json
 
     SHELL
   end
